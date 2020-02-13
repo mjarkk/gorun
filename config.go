@@ -56,8 +56,7 @@ func getConfig() Config {
 			fmt.Println("Config not found, available configs:")
 			for configName := range fullConfig {
 				if configName == "" {
-					fmt.Print("[default]")
-					continue
+					configName = "[default]"
 				}
 				fmt.Print(configName + " ")
 			}
