@@ -53,7 +53,15 @@ func getConfig() Config {
 			fmt.Println("  }")
 			fmt.Println("}")
 		} else {
-			fmt.Println("could not find custom config " + configToUse + " in config file")
+			fmt.Println("Config not found, available configs:")
+			for configName := range fullConfig {
+				if configName == "" {
+					fmt.Print("[default]")
+					continue
+				}
+				fmt.Print(configName + " ")
+			}
+			fmt.Println()
 		}
 		os.Exit(1)
 	}
