@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
+	"os"
 	"os/exec"
 	"strings"
 	"sync"
@@ -44,15 +45,60 @@ func (s *printer) String() (out string) {
 	return
 }
 
+type parsedCommand struct {
+	program string
+	args    []string
+	env     []string
+}
+
+func (c *Config) parseCommand(programName string) (parsedCommand, error) {
+	commandParts := strings.Split((*c)[programName], " ")
+	output := parsedCommand{
+		env:  []string{},
+		args: []string{},
+	}
+
+	addedProgram := false
+
+	for _, part := range commandParts {
+		if part == "" {
+			continue
+		}
+		if addedProgram {
+			output.args = append(output.args, part)
+			continue
+		}
+		if strings.Contains(part, "=") {
+			output.env = append(output.env, part)
+			continue
+		}
+		output.program = part
+		addedProgram = true
+	}
+
+	return output, nil
+}
+
 // exec executes a program defined in the config
 func (c *Config) exec(programName string) error {
-	cmd := exec.Command("go", "run", (*c)[programName])
+	parsedCommand, err := c.parseCommand(programName)
+	if err != nil {
+		fmt.Println("Can't parse start argument, err:", err)
+	}
+
+	args := append([]string{
+		"run",
+		parsedCommand.program,
+	}, parsedCommand.args...)
+
+	cmd := exec.Command("go", args...)
+	cmd.Env = append(os.Environ(), parsedCommand.env...)
 
 	output := &printer{name: programName}
 	cmd.Stderr = output
 	cmd.Stdout = output
 
-	err := cmd.Run()
+	err = cmd.Run()
 	if err != nil {
 		return errors.New(output.String())
 	}
