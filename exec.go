@@ -11,8 +11,6 @@ import (
 	"unicode/utf8"
 )
 
-var printLock sync.Mutex
-
 type printer struct {
 	name string
 	buff bytes.Buffer
@@ -28,9 +26,7 @@ func (s *printer) Write(p []byte) (n int, err error) {
 		parts[i] = part
 	}
 
-	printLock.Lock()
 	fmt.Print(strings.Join(parts, "\n"))
-	printLock.Unlock()
 
 	s.lock.Lock()
 	n, err = s.buff.Write(p)
@@ -49,34 +45,6 @@ type parsedCommand struct {
 	program string
 	args    []string
 	env     []string
-}
-
-func (c *Config) parseCommand(programName string) (parsedCommand, error) {
-	commandParts := strings.Split((*c)[programName], " ")
-	output := parsedCommand{
-		env:  []string{},
-		args: []string{},
-	}
-
-	addedProgram := false
-
-	for _, part := range commandParts {
-		if part == "" {
-			continue
-		}
-		if addedProgram {
-			output.args = append(output.args, part)
-			continue
-		}
-		if strings.Contains(part, "=") {
-			output.env = append(output.env, part)
-			continue
-		}
-		output.program = part
-		addedProgram = true
-	}
-
-	return output, nil
 }
 
 // exec executes a program defined in the config
