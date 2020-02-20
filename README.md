@@ -18,7 +18,8 @@ Add a config like this:
     "email": "workers/email/Email.go",
     "notifi": "workers/notifications/Notifications.go",
     "paymnt": "workers/payments/Payments.go --mock",
-    "export": "ALLOW_EXPERIMENTAL=true workers/exports/Exports.go"
+    "export": "ALLOW_EXPERIMENTAL=true workers/exports/Exports.go",
+    "images": "$ some_non_go_program",
   }
 }
 ```
@@ -36,7 +37,7 @@ You can also add custom configs like this:
 ```
 And use the config via `gorun minimal`
 
-### Program X it's output is now broken, will you fix it?
+### Program `program_name_here` it's output is now broken, will you fix it?
 TL;DR: No,  
 Buttt, if it fixes the output for a lot of things maybe.  
 The main purpose of this program is to run a lot of little microservices that just log garbage and to know from which micro service came the log.  

@@ -14,6 +14,13 @@ func (c *Config) parseCommand(program string) (parsedCommand, error) {
 		args: []string{},
 	}
 
+	command = strings.TrimSpace(command)
+	if strings.HasPrefix(command, "$") {
+		output.isNotGo = true
+		command = strings.TrimLeft(command, "$")
+		command = strings.TrimSpace(command)
+	}
+
 	buff := bytes.NewBuffer(nil)
 	isInsideQoutes := ""
 	isEscaped := false

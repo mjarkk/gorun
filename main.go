@@ -12,7 +12,7 @@ func main() {
 
 	for programName := range programs {
 		go func(programName string) {
-			errChan <- programs.exec(programName)
+			errChan <- programs.Exec(programName)
 		}(programName)
 	}
 

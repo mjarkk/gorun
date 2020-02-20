@@ -45,21 +45,26 @@ type parsedCommand struct {
 	program string
 	args    []string
 	env     []string
+	isNotGo bool // If the command is prefixed with $ it will be executed as a normal command
 }
 
-// exec executes a program defined in the config
-func (c *Config) exec(programName string) error {
+// Exec executes a program defined in the config
+func (c *Config) Exec(programName string) error {
 	parsedCommand, err := c.parseCommand(programName)
 	if err != nil {
 		fmt.Println("Can't parse start argument, err:", err)
 	}
 
-	args := append([]string{
+	fullCommand := append([]string{
+		"go",
 		"run",
 		parsedCommand.program,
 	}, parsedCommand.args...)
+	if parsedCommand.isNotGo {
+		fullCommand = fullCommand[2:]
+	}
 
-	cmd := exec.Command("go", args...)
+	cmd := exec.Command(fullCommand[0], fullCommand[1:]...)
 	cmd.Env = append(os.Environ(), parsedCommand.env...)
 
 	output := &printer{name: programName}
